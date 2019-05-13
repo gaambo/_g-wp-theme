@@ -1,0 +1,13 @@
+{% macro multiLevelMenu(items) %}
+  {% import _self as menuMacros %}
+  {% for item in items %}
+    <li class="{{ item.classes | join(' ') }}">
+      <a target="{{ item.target }}" href="{{ item.link }}">{{ item.title }}</a>
+      {% if item.has_child_class %}
+        <ul class="sub-nav">
+          {{ menuMacros.multiLevelMenu(item.get_children) }}
+        </ul>
+      {% endif %}
+    </li>
+  {% endfor %}
+{% endmacro %}

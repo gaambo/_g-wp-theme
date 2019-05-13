@@ -1,0 +1,11 @@
+{% extends "_base.twig" %}
+
+{% block content %}
+	<h2>{{ foo }}</h2>
+	<p>{{ qux }}</p>
+	{% for post in posts %}
+		{% include ['partials/_list-item-'~post.post_type~'.twig', 'partials/_list-item.twig'] %}
+	{% endfor %}
+	
+	{% include 'partials/_pagination.twig' with { pagination: posts.pagination({show_all: false, mid_size: 3, end_size: 2}) } %}
+{% endblock %}
