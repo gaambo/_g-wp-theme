@@ -1,6 +1,6 @@
 <?php
 
-namespace Vanilla\Assets;
+namespace UnderscoreG\Assets;
 
 function init()
 {
@@ -19,7 +19,7 @@ function enqueue_scripts()
         'theme-bundle',
         $assets_url . 'js/bundle.js',
         [],
-        VANILLA_VERSION,
+        UNDERSCOREG_VERSION,
         true //in footer
     );
 }
@@ -42,7 +42,7 @@ function enqueue_styles()
         'theme-styles',
         $assets_url . 'css/main.css',
         [],
-        VANILLA_VERSION,
+        UNDERSCOREG_VERSION,
         false // in footer
     );
 }

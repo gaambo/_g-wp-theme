@@ -1,1 +1,6 @@
 /vendor
+/node_modules
+/assets/*
+!/assets/src
+/.cache
+/.vscode

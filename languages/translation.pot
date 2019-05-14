@@ -13,3 +13,14 @@ msgstr ""
 "X-Poedit-SourceCharset: UTF-8\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
+#: .cache/templates/404.php:4
+msgid "Sorry, we couldn't find what you're looking for."
+msgstr ""
+
+#: includes/theme.php:137
+msgid "Sidebar"
+msgstr ""
+
+#: includes/theme.php:139
+msgid "Add widgets here."
+msgstr ""

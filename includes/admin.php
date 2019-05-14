@@ -1,6 +1,6 @@
 <?php
 
-namespace Vanilla\Admin;
+namespace UnderscoreG\Admin;
 
 function init()
 {
