@@ -1,4 +1,4 @@
-# _g WordPress Theme
+# \_g WordPress Theme
 
 A boilerplate theme based on [Timber](https://github.com/timber/timber) making usage of [Gulp](http://gulpjs.com/) with [LibSass](http://sass-lang.com/), [Babel](https://babeljs.io/), [PostCSS](https://github.com/postcss/postcss), [BrowserSync](https://www.browsersync.io/) etc. Perfect for custom developed themes and working with [Advanced Custom Fields](https://www.advancedcustomfields.com/).
 
@@ -7,8 +7,10 @@ This boilerplate is also used in my [UnderscoreG WP](https://github.com/gaambo/u
 ## Installation
 
 1. Clone the repository from Github into the `themes` directory or download the repository and unpack it into the `themes` folder.
-2. Run `composer install` in the `themes` directory or `composer install -d path/to/themes/directory` from your project root if you have composer setup there too.
-   
+2. Delete the `.git` folder.
+3. Run `composer install` in the theme directory or `composer install -d path/to/themes/directory` from your project root if you have composer setup there too.
+4. Run `npm install` in the theme directory.
+
 This theme serves as a boilerplate so there's no sense in keeping it as a git-submodule (except in other boilerplates).
 
 ## Deployment
@@ -40,7 +42,7 @@ Only files needed for production should be deployed to the production server. He
 I use [Prettier](https://prettier.io/) for (S)CSS and [Airbnb Javascript Style Guide](https://github.com/airbnb/javascript) in combination with Prettier in JavaScript. I think Prettier defines some sane guidelines and I just really like the Airbnb Javascript Style Guide. The [WordPress Coding Standards](https://make.wordpress.org/core/handbook/best-practices/coding-standards/javascript/) do not really work for me for multiple reasons (and I use Prettier + Airbnb in other Projects too). You can always change ESLint (`.eslintrc.json`) and StyleLint (`.stylelintrc.json`) configurtion to fit your personal preferences.
 Personally I think if you don't develop for core you should always use modern coding style guides.
 
-### PHP CS 
+### PHP CS
 
 [WordPress Coding Standards](https://make.wordpress.org/core/handbook/best-practices/coding-standards/php/) do not use modern PHP. I use [PSR2](https://www.php-fig.org/psr/psr-2/) because they are the most common in PHP projects.
 Personally I think if you don't develop for core you should always use modern coding style guides.
