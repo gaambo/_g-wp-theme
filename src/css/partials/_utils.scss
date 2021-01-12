@@ -1,3 +1,35 @@
 .screen-reader-text {
   @include screen-reader-text;
 }
+
+.mb-0 {
+  margin-bottom: 0 !important;
+}
+
+.ml-auto {
+  margin-left: auto !important;
+}
+
+.mr-auto {
+  margin-right: auto !important;
+}
+
+.text-right {
+  text-align: right !important;
+}
+
+@each $color-name, $color in $colors {
+  // Add theme colors as CSS custom properties
+  :root {
+    --#{$color-name}: #{$color};
+  }
+
+  // Add standard WP-Block classes based on  theme colors
+  .has-#{$color-name}-color,
+  .wp-block-button__link.has-text-color.has-#{$color-name}-color {
+    color: $color;
+  }
+  .has-#{$color-name}-background-color {
+    background-color: $color;
+  }
+}

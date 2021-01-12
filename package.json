@@ -16,11 +16,10 @@
   "devDependencies": {
     "@babel/core": "^7.3.4",
     "@babel/preset-env": "^7.3.4",
+    "@babel/preset-react": "^7.12.1",
     "@babel/register": "^7.4.0",
-    "browser-sync": "^2.11.1",
     "del": "^4.0.0",
     "eslint": "^5.15.3",
-    "eslint-config-airbnb": "^17.1.0",
     "eslint-config-prettier": "^4.1.0",
     "eslint-plugin-import": "^2.16.0",
     "eslint-plugin-prettier": "^3.0.1",
@@ -30,7 +29,6 @@
     "gulp-concat": "^2.5.2",
     "gulp-filter": "^5.1.0",
     "gulp-imagemin": "^4.1.0",
-    "gulp-notify": "^3.0.0",
     "gulp-plumber": "^1.2.0",
     "gulp-rename": "^1.2.0",
     "gulp-replace": "^1.0.0",
@@ -46,7 +44,12 @@
     "prettier": "^1.16.4",
     "stylelint": "^9.10.1",
     "stylelint-config-prettier": "^4.0.0",
-    "stylelint-prettier": "^1.0.6"
+    "stylelint-prettier": "^1.0.6",
+    "gulp-better-rollup": "^4.0.1",
+    "rollup": "^2.32.1",
+    "rollup-plugin-babel": "^4.4.0",
+    "rollup-plugin-commonjs": "^10.1.0",
+    "rollup-plugin-node-resolve": "^5.2.0"
   },
   "scripts": {
     "build": "gulp build",

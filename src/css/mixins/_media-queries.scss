@@ -1,3 +1,29 @@
-$tablet: 768px;
-$laptop: 1024px;
-$desktop: 1200px;
+@mixin mobile() {
+  @media (max-width: $mobile - 1) {
+    @content;
+  }
+}
+
+@mixin tablet-only() {
+  @media (min-width: $mobile) and (max-width: $desktop - 1) {
+    @content;
+  }
+}
+
+@mixin tablet-down() {
+  @media (max-width: $desktop - 1) {
+    @content;
+  }
+}
+
+@mixin tablet-up() {
+  @media (min-width: $mobile) {
+    @content;
+  }
+}
+
+@mixin desktop() {
+  @media (min-width: $desktop) {
+    @content;
+  }
+}

@@ -18,8 +18,8 @@ define('UNDERSCOREG_DIR', \plugin_dir_path(__FILE__));
 
 require_once UNDERSCOREG_DIR . 'includes/theme.php';
 
-require_once UNDERSCOREG_DIR . 'includes/admin.php';
 require_once UNDERSCOREG_DIR . 'includes/assets.php';
+require_once UNDERSCOREG_DIR . 'includes/editor.php';
 
 
 $theme = new Theme();

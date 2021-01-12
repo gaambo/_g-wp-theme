@@ -1,8 +1,8 @@
 # \_g WordPress Theme
 
-A boilerplate theme based on [Timber](https://github.com/timber/timber) making usage of [Gulp](http://gulpjs.com/) with [LibSass](http://sass-lang.com/), [Babel](https://babeljs.io/), [PostCSS](https://github.com/postcss/postcss), [BrowserSync](https://www.browsersync.io/) etc. Perfect for custom developed themes and working with [Advanced Custom Fields](https://www.advancedcustomfields.com/).
+A boilerplate theme based on [Timber](https://github.com/timber/timber) making usage of [Gulp](http://gulpjs.com/) with [LibSass](http://sass-lang.com/), [Babel](https://babeljs.io/), [PostCSS](https://github.com/postcss/postcss) etc. Perfect for custom developed themes and working with [Advanced Custom Fields](https://www.advancedcustomfields.com/).
 
-This boilerplate is also used in my [UnderscoreG WP](https://github.com/gaambo/underscoreg-wp) and [Cobblestone](https://github.com/gaambo/cobblestone-wp) boilerplates. You can find more information there.
+This boilerplate is also used in my [Vanilla WP](https://github.com/gaambo/vanilla-wp) boilerplate. You can find more information there.
 
 ## Installation
 
@@ -39,7 +39,7 @@ Only files needed for production should be deployed to the production server. He
 
 ### ESLint & StyleLint Configuration
 
-I use [Prettier](https://prettier.io/) for (S)CSS and [Airbnb Javascript Style Guide](https://github.com/airbnb/javascript) in combination with Prettier in JavaScript. I think Prettier defines some sane guidelines and I just really like the Airbnb Javascript Style Guide. The [WordPress Coding Standards](https://make.wordpress.org/core/handbook/best-practices/coding-standards/javascript/) do not really work for me for multiple reasons (and I use Prettier + Airbnb in other Projects too). You can always change ESLint (`.eslintrc.json`) and StyleLint (`.stylelintrc.json`) configurtion to fit your personal preferences.
+I use [Prettier](https://prettier.io/) for (S)CSS and JavaScript. I think Prettier defines some sane guidelines. The [WordPress Coding Standards](https://make.wordpress.org/core/handbook/best-practices/coding-standards/javascript/) do not really work for me for multiple reasons (and I use Prettier + Airbnb in other Projects too). You can always change ESLint (`.eslintrc.json`) and StyleLint (`.stylelintrc.json`) configurtion to fit your personal preferences.
 Personally I think if you don't develop for core you should always use modern coding style guides.
 
 ### PHP CS
@@ -58,7 +58,3 @@ I don't like the idea of using a single "registry" class per theme/plugin to reg
 ### Twig / Timber
 
 Because seperating logic and view makes life easier. Also [Timber](https://github.com/timber/timber) provides some very useful helper.
-
-### Directory Structure
-
-Most of the times I work with WordPress I build complete sites. Therefore for a longe time all dependencies (npm, composer) were managed at the root level of the project (one level above document root). I still think this is a very good way, **but** since I manage two kinds of WordPress boilerplates ([Vanilla WP](https://github.com/gaambo/vanilla-wp) and [Cobblestone WP](https://github.com/gaambo/cobblestone-wp)) for different requirements (eg possibility to install dependencies outside of document root is not given with some hosters) I had to manage the boilerplate theme in two places. Now my boilerplate theme lives here and is used in both WordPress site boilerpaltes. In sites/projects managed with composer/Cobblestone/Bedrock I pull out the theme dependencies into the root directory. Also all development utils (ESLint, StyleLint, Gulp) are in the document root.

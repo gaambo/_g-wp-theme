@@ -2,13 +2,6 @@
 
 namespace UnderscoreG\Assets;
 
-function init()
-{
-        add_action('wp_enqueue_scripts', __NAMESPACE__ . "\\enqueue_scripts");
-        add_action('wp_enqueue_scripts', __NAMESPACE__ . "\\enqueue_styles");
-        add_action('wp_footer', __NAMESPACE__ . "\\favicons");
-}
-
 function enqueue_scripts()
 {
     $assets_url = \get_template_directory_uri() . '/assets/';
@@ -23,6 +16,7 @@ function enqueue_scripts()
         true //in footer
     );
 }
+add_action('wp_enqueue_scripts', __NAMESPACE__ . '\enqueue_scripts');
 
 function enqueue_styles()
 {
@@ -46,6 +40,7 @@ function enqueue_styles()
         false // in footer
     );
 }
+add_action('wp_enqueue_scripts', __NAMESPACE__ . '\enqueue_styles');
 
 function favicons()
 {
@@ -62,3 +57,4 @@ function favicons()
 		<meta name="theme-color" content="#213b5e">
 		';
 }
+add_action('wp_footer', __NAMESPACE__ . '\favicons');

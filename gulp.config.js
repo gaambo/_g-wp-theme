@@ -3,17 +3,70 @@ export default {
   dstDir: "./assets",
   styles: {
     srcDir: "./src/css",
-    src: "main.scss",
+    src: ["main.scss", "editor.scss"],
     dstDir: "./assets/css",
     prefixBrowsers: ["last 2 versions", "> 2%"]
   },
   scripts: {
     srcDir: "./src/js",
-    src: "**/*.js",
+    entries: [
+      "main.js",
+      {
+        path: "editor.js",
+        babelConfig: {
+          exclude: ["node_modules/classnames/**"],
+          presets: ["@babel/preset-env", "@babel/preset-react"]
+        }
+      }
+    ],
     dstDir: "./assets/js",
-    babelPreset: "@babel/preset-env",
-    bundleName: "bundle",
-    requires: []
+    babelPreset: ["@babel/preset-env"],
+    external: [
+      "jquery",
+      "@wordpress/components",
+      "@wordpress/compose",
+      "@wordpress/edit-post",
+      "@wordpress/block-editor",
+      "@wordpress/dom-ready",
+      "@wordpress/element",
+      "@wordpress/plugins",
+      "@wordpress/editor",
+      "@wordpress/blocks",
+      "@wordpress/hooks",
+      "@wordpress/utils",
+      "@wordpress/date",
+      "@wordpress/data",
+      "@wordpress/i18n",
+      "@wordpress/url",
+      "@wordpress/a11y",
+      "@wordpress/keycodes",
+      "lodash",
+      "react",
+      "react-dom"
+    ],
+    globals: {
+      jquery: "jQuery",
+      "@wordpress/components": "wp.components",
+      "@wordpress/compose": "wp.compose",
+      "@wordpress/edit-post": "wp.editPost",
+      "@wordpress/dom-ready": "wp.domReady",
+      "@wordpress/block-editor": "wp.blockEditor",
+      "@wordpress/element": "wp.element",
+      "@wordpress/plugins": "wp.plugins",
+      "@wordpress/editor": "wp.editor",
+      "@wordpress/blocks": "wp.blocks",
+      "@wordpress/hooks": "wp.hooks",
+      "@wordpress/utils": "wp.utils",
+      "@wordpress/date": "wp.date",
+      "@wordpress/data": "wp.data",
+      "@wordpress/i18n": "wp.i18n",
+      "@wordpress/url": "wp.url",
+      "@wordpress/a11y": "wp.a11y",
+      "@wordpress/keycodes": "wp.keycodes",
+      lodash: "lodash",
+      react: "React",
+      "react-dom": "ReactDOM"
+    }
   },
   images: {
     srcDir: "./src/images",

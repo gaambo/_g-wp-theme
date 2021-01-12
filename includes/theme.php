@@ -41,11 +41,6 @@ class Theme extends Site
         add_filter('timber/context', array( $this, 'addToContext' ));
         add_filter('timber/twig', array( $this, 'addToTwig' ));
 
-        Assets\init();
-
-        if (is_admin()) {
-            Admin\init();
-        }
 
         parent::__construct();
     }
@@ -75,6 +70,48 @@ class Theme extends Site
         add_theme_support('title-tag');
         add_theme_support('menus');
         add_theme_support('sidebar');
+
+        add_theme_support('wp-block-styles');
+
+        add_theme_support('editor-styles');
+        add_editor_style('assets/css/editor.css');
+
+        // TODO: Edit colors
+        add_theme_support('editor-color-palette', [
+            [
+                'name' => __('Primär', 'underscoreg'),
+                'slug' => 'primary',
+                'color' => '#477da0'
+            ],
+            [
+                'name' => __('Weiss', 'underscoreg'),
+                'slug' => 'white',
+                'color' => '#ffffff'
+            ],
+            [
+                'name' => __('Dunkel', 'underscoreg'),
+                'slug' => 'dark',
+                'color' => '#201e1d'
+            ],
+            [
+                'name' => __('Dark Blue', 'underscoreg'),
+                'slug' => 'blue-dark',
+                'color' => '#1e3759'
+            ],
+            [
+                'name' => __('Light Blue', 'underscoreg'),
+                'slug' => 'blue-light',
+                'color' => '#99d4de'
+            ],
+        ]);
+
+        // add_theme_support('editor-font-sizes', [
+        //     [
+        //         'name' => __('Normal', 'underscoreg'),
+        //         'slug' => 'normal',
+        //         'size' => 16,
+        //     ],
+        // ]);
     }
 
     /**

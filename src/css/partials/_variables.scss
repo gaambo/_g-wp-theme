@@ -1,0 +1,42 @@
+/** BREAKPOINTS **/
+$tablet: 768px;
+$desktop: 1024px;
+$desktop-lg: 1200px;
+
+$container-width: 1024px;
+
+/** COLORS **/
+$white: #ffffff;
+$blue-dark: #1e3759;
+$blue: #477da0;
+$blue-light: #99d4de;
+$dark: #201e1d;
+
+$primary: $blue;
+$colors: (
+  "white": $white,
+  "blue-dark": $blue-dark,
+  "blue": $blue,
+  "blue-light": $blue-light,
+  "dark": $dark,
+  "primary": $primary,
+);
+
+/** FONTS **/
+$font-color-base: #000;
+$font-color-headlines: gray;
+$font-color-light: gray;
+
+$font-family-base: "Open Sans", sans-serif;
+$font-family-headlines: "Varela Round", sans-serif;
+
+/**
+ * generated with https://type-scale.com/
+ */
+$font-size-base: 18px;
+$font-size-h1: 3.052rem;
+$font-size-h2: 2.441rem;
+$font-size-h3: 1.953rem;
+$font-size-h4: 1.563rem;
+$font-size-h5: 1.25rem;
+$font-size-small: 0.8rem;

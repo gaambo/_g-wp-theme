@@ -3,9 +3,11 @@ import path from "path";
 import merge from "merge-stream";
 import del from "del";
 import filter from "gulp-filter";
-import concat from "gulp-concat"; // Concatenates JS files.
 import uglifyJS from "gulp-uglify"; // Minifies JS files.
-import babel from "gulp-babel"; // Compiles ESNext to browser compatible JS.
+import rollup from "gulp-better-rollup";
+import babel from "rollup-plugin-babel";
+import rollupResolveNode from "rollup-plugin-node-resolve";
+import rollupResolveCommonjs from "rollup-plugin-commonjs";
 import plumber from "gulp-plumber"; // Prevent pipe breaking caused by errors from gulp plugins.
 import rename from "gulp-rename"; // Renames files E.g. style.css -> style.min.css.
 import replace from "gulp-replace";
@@ -13,7 +15,6 @@ import sourcemaps from "gulp-sourcemaps"; // Maps code in a compressed file (E.g
 import sass from "gulp-sass"; // Gulp plugin for Sass compilation.
 import uglifyCSS from "gulp-uglifycss"; // Minifies CSS files.
 import autoprefixer from "gulp-autoprefixer"; // Autoprefixing magic.
-import notify from "gulp-notify";
 import imagemin from "gulp-imagemin"; // Minify PNG, JPEG, GIF and SVG images with imagemin.
 
 import sort from "gulp-sort"; // Recommended to prevent unnecessary changes in pot-file.
@@ -22,10 +23,10 @@ import wpPot from "gulp-wp-pot"; // For generating the .pot file.
 import config from "./gulp.config";
 
 /**
- * An error handler method to be used with plumber. Sends a notification via {@link gulp-notify}.
+ * An error handler method to be used with plumber.
  */
-const errorHandler = r => {
-  notify.onError("❌ ERROR: <%= error.message %>\n")(r);
+const errorHandler = error => {
+  console.error(error.messageFormatted);
 };
 
 /**
@@ -179,42 +180,77 @@ export const copyOtherFiles = done => {
  * Concatenate, compiles and minifies scripts and adds sourcemaps.
  */
 export const scripts = () => {
-  let paths = Array.isArray(config.scripts.src) // ensure src is array
-    ? config.scripts.src
-    : [config.scripts.src];
-  paths = paths.map(p => path.join(config.scripts.srcDir, p)); // prefix srcDir
-  if (config.scripts.requires) {
-    // if external libs/vendor libs insert them before other scripts in bundle
-    paths.unshift(...config.scripts.requires);
-  }
-  return gulp
-    .src(paths)
-    .pipe(plumber({ errorHandler }))
-    .pipe(sourcemaps.init())
-    .pipe(
-      babel({
-        presets: [[config.scripts.babelPreset]]
-      })
-    )
-    .pipe(concat(`${config.scripts.bundleName}.js`))
-    .pipe(sourcemaps.write("./"))
-    .pipe(gulp.dest(config.scripts.dstDir))
-    .pipe(filter("**/*.js")) // remove maps from stream
-    .pipe(rename({ suffix: ".min" }))
-    .pipe(uglifyJS())
-    .pipe(sourcemaps.write("./"))
-    .pipe(gulp.dest(config.scripts.dstDir));
+  let paths = Array.isArray(config.scripts.entries) // ensure src is array
+    ? config.scripts.entries
+    : [config.scripts.entries];
+  // prefix srcDir
+  paths = paths.map(p => {
+    if (typeof p === "string") {
+      return { path: path.join(config.scripts.srcDir, p) };
+    }
+
+    const { path: entryPath, ...entryConfig } = p;
+
+    return {
+      path: path.join(config.scripts.srcDir, entryPath),
+      ...entryConfig
+    };
+  });
+
+  const tasks = paths.map(entry => {
+    const { path: entryPath, ...entryConfig } = entry;
+    return gulp
+      .src(entryPath, { base: config.scripts.srcDir })
+      .pipe(sourcemaps.init())
+      .pipe(plumber(errorHandler))
+      .pipe(
+        rollup(
+          {
+            plugins: [
+              babel({
+                presets: config.scripts.babelPreset,
+                // exclude: ["node_modules/**"],
+                ...(entryConfig.babelConfig || {})
+              }),
+              rollupResolveNode(),
+              rollupResolveCommonjs()
+            ],
+            external: config.scripts.external,
+            ...(entryConfig.rollupConfig || {})
+          },
+          {
+            format: "iife",
+            globals: config.scripts.globals,
+            intro: config.scripts.intro || "",
+            ...(entryConfig.rollupOutputConfig || {})
+          }
+        )
+      )
+      .pipe(sourcemaps.write("./"))
+      .pipe(gulp.dest(config.scripts.dstDir))
+      .pipe(filter("**/*.js")) // remove maps from stream
+      .pipe(rename({ suffix: ".min" }))
+      .pipe(uglifyJS())
+      .pipe(gulp.dest(config.scripts.dstDir));
+  });
+
+  return merge(tasks);
 };
 
 /**
  * Concatenate, compiles and minifies stiles and adds sourcemaps.
  */
-export const styles = () =>
-  gulp
-    .src(path.join(config.styles.srcDir, config.styles.src), {
+export const styles = () =>{
+  let paths = Array.isArray(config.styles.src) // ensure src is array
+    ? config.styles.src
+    : [config.styles.src];
+  paths = paths.map(p => path.join(config.styles.srcDir, p)); // prefix srcDir
+
+  return gulp
+    .src(paths, {
       base: config.styles.srcDir
     })
-    .pipe(plumber({ errorHandler }))
+    .pipe(plumber(errorHandler))
     .pipe(sourcemaps.init())
     .pipe(sass({ includePaths: ["node_modules"] }))
     .pipe(autoprefixer(config.styles.prefixBrowsers))
@@ -225,6 +261,7 @@ export const styles = () =>
     .pipe(uglifyCSS())
     .pipe(sourcemaps.write("./"))
     .pipe(gulp.dest(config.styles.dstDir));
+};
 
 /**
  * Optimizes all images

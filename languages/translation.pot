@@ -1,4 +1,4 @@
-# Copyright (C) 2019 unnamed project
+# Copyright (C) 2021 unnamed project
 # This file is distributed under the same license as the unnamed project package.
 msgid ""
 msgstr ""
@@ -13,7 +13,7 @@ msgstr ""
 "X-Poedit-SourceCharset: UTF-8\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: .cache/templates/404.php:4
+#: .cache/404.php:4, .cache/templates/404.php:4
 msgid "Sorry, we couldn't find what you're looking for."
 msgstr ""
 
