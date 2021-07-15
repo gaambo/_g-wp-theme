@@ -4,8 +4,7 @@ export default {
   styles: {
     srcDir: "./src/css",
     src: ["main.scss", "editor.scss"],
-    dstDir: "./assets/css",
-    prefixBrowsers: ["last 2 versions", "> 2%"]
+    dstDir: "./assets/css"
   },
   scripts: {
     srcDir: "./src/js",
@@ -14,13 +13,24 @@ export default {
       {
         path: "editor.js",
         babelConfig: {
-          exclude: ["node_modules/classnames/**"],
+          // exclude: ["node_modules/classnames/**"],
           presets: ["@babel/preset-env", "@babel/preset-react"]
         }
       }
     ],
     dstDir: "./assets/js",
-    babelPreset: ["@babel/preset-env"],
+    babelPreset: [
+      [
+        "@babel/env",
+        {
+          corejs: 2,
+          useBuiltIns: "usage",
+          targets: {
+            browsers: "defaults"
+          }
+        }
+      ]
+    ],
     external: [
       "jquery",
       "@wordpress/components",
@@ -81,7 +91,7 @@ export default {
   },
   otherFiles: [
     // examples:
-    // "./src/fonts/**/*",
+    "./src/fonts/**/*"
     // {
     //   origPath: ["node_modules/optinout.js/dist/optinout.js"],
     //   path: "web/app/themes/efs/assets/libs/"

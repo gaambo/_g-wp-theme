@@ -13,14 +13,39 @@ msgstr ""
 "X-Poedit-SourceCharset: UTF-8\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: .cache/404.php:4, .cache/templates/404.php:4
-msgid "Sorry, we couldn't find what you're looking for."
+#: includes/editor.php:17
+msgctxt "Block pattern category"
+msgid "UnderscoreG"
 msgstr ""
 
-#: includes/theme.php:137
+#: includes/editor.php:25
+msgid "Custom Pattern"
+msgstr ""
+
+#: includes/theme.php:82
+msgid "Primär"
+msgstr ""
+
+#: includes/theme.php:87
+msgid "Weiss"
+msgstr ""
+
+#: includes/theme.php:92
+msgid "Dunkel"
+msgstr ""
+
+#: includes/theme.php:97
+msgid "Dark Blue"
+msgstr ""
+
+#: includes/theme.php:102
+msgid "Light Blue"
+msgstr ""
+
+#: includes/theme.php:174
 msgid "Sidebar"
 msgstr ""
 
-#: includes/theme.php:139
+#: includes/theme.php:176
 msgid "Add widgets here."
 msgstr ""

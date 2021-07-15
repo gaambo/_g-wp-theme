@@ -1,125 +1,45 @@
 import gulp from "gulp";
+
+// GULP UTILS
 import path from "path";
-import merge from "merge-stream";
 import del from "del";
-import filter from "gulp-filter";
-import uglifyJS from "gulp-uglify"; // Minifies JS files.
-import rollup from "gulp-better-rollup";
-import babel from "rollup-plugin-babel";
-import rollupResolveNode from "rollup-plugin-node-resolve";
-import rollupResolveCommonjs from "rollup-plugin-commonjs";
 import plumber from "gulp-plumber"; // Prevent pipe breaking caused by errors from gulp plugins.
-import rename from "gulp-rename"; // Renames files E.g. style.css -> style.min.css.
-import replace from "gulp-replace";
+import sort from "gulp-sort"; // Recommended to prevent unnecessary changes in pot-file.
+
+// JAVASCRIPT
+import { terser } from "rollup-plugin-terser"; // Minifies JS files.
+import { rollup } from "rollup";
+import babel from "@rollup/plugin-babel";
+import rollupResolveNode from "@rollup/plugin-node-resolve";
+import rollupResolveCommonjs from "@rollup/plugin-commonjs";
+
+// CSS
 import sourcemaps from "gulp-sourcemaps"; // Maps code in a compressed file (E.g. style.css) back to it’s original position in a source file (E.g. structure.scss, which was later combined with other css files to generate style.css).
-import sass from "gulp-sass"; // Gulp plugin for Sass compilation.
-import uglifyCSS from "gulp-uglifycss"; // Minifies CSS files.
+import gulpSass from "gulp-sass"; // Gulp plugin for Sass compilation.
+import sassCompiler from "sass";
+const sass = gulpSass(sassCompiler);
 import autoprefixer from "gulp-autoprefixer"; // Autoprefixing magic.
+
+// IMAGES
 import imagemin from "gulp-imagemin"; // Minify PNG, JPEG, GIF and SVG images with imagemin.
 
-import sort from "gulp-sort"; // Recommended to prevent unnecessary changes in pot-file.
+// TRANSLATION
 import wpPot from "gulp-wp-pot"; // For generating the .pot file.
 
+// CONFIG
 import config from "./gulp.config";
 
-/**
- * An error handler method to be used with plumber.
- */
-const errorHandler = error => {
-  console.error(error.messageFormatted);
-};
+// HELPER
+let isProduction = false;
 
-/**
- * __
- * _e
- * _x
- * _xn
- * _ex
- * _n_noop
- * _nx_noop
- * translate  -> Match __,  _e, _x and so on
- * \(         -> Match (
- * \s*?       -> Match empty space 0 or infinite times, as few times as possible (ungreedy)
- * ['"]     -> Match ' or "
- * .+?        -> Match any character, 1 to infinite times, as few times as possible (ungreedy)
- * ,          -> Match ,
- * .+?        -> Match any character, 1 to infinite times, as few times as possible (ungreedy)
- * \)         -> Match )
- */
-const gettextRegex = {
-  // _e( "text", "domain" )
-  // __( "text", "domain" )
-  // translate( "text", "domain" )
-  // esc_attr__( "text", "domain" )
-  // esc_attr_e( "text", "domain" )
-  // esc_html__( "text", "domain" )
-  // esc_html_e( "text", "domain" )
-  simple: /(__|_e|translate|esc_attr__|esc_attr_e|esc_html__|esc_html_e)\(\s*?['"].+?['"]\s*?,\s*?['"].+?['"]\s*?\)/g,
-
-  // _n( "single", "plural", number, "domain" )
-  plural: /_n\(\s*?['"].*?['"]\s*?,\s*?['"].*?['"]\s*?,\s*?.+?\s*?,\s*?['"].+?['"]\s*?\)/g,
-
-  // _x( "text", "context", "domain" )
-  // _ex( "text", "context", "domain" )
-  // esc_attr_x( "text", "context", "domain" )
-  // esc_html_x( "text", "context", "domain" )
-  // _nx( "single", "plural", "number", "context", "domain" )
-  disambiguation: /(_x|_ex|_nx|esc_attr_x|esc_html_x)\(\s*?['"].+?['"]\s*?,\s*?['"].+?['"]\s*?,\s*?['"].+?['"]\s*?\)/g,
-
-  // _n_noop( "singular", "plural", "domain" )
-  // _nx_noop( "singular", "plural", "context", "domain" )
-  noop: /(_n_noop|_nx_noop)\((\s*?['"].+?['"]\s*?),(\s*?['"]\w+?['"]\s*?,){0,1}\s*?['"].+?['"]\s*?\)/g
-};
-
-/**
- * Fake Twig Gettext Compiler
- *
- * Searches and replaces all occurences of __('string', 'domain'), _e('string', 'domain') and so on,
- * with <?php __('string', 'domain'); ?> or <?php _e('string', 'domain'); ?> and saves the content
- * in a .php file with the same name in the cache folder.
- *
- * Functions supported:
- *
- * Simple: __(), _e(), translate()
- * Plural: _n()
- * Disambiguation: _x(), _ex(), _nx()
- * Noop: _n_loop(), _nx_noop()
- */
-const compileTwigs = () => {
-  const cacheFolder = path.join(
-    config.translate.srcDir,
-    config.translate.cacheFolder
-  );
-  let twigFiles = Array.isArray(config.translate.twigFiles) // ensure src is array
-    ? config.translate.twigFiles
-    : [config.translate.twigFiles];
-  twigFiles = twigFiles.map(p => path.join(config.translate.srcDir, p)); // prefix srcDir
-
-  del.bind(null, [cacheFolder], { force: true });
-  // Iterate over .twig files
-  return (
-    gulp
-      .src(twigFiles)
-      // Search for Gettext function calls and wrap them around PHP tags.
-      .pipe(replace(gettextRegex.simple, match => `<?php ${match}; ?>`))
-      .pipe(replace(gettextRegex.plural, match => `<?php ${match}; ?>`))
-      .pipe(replace(gettextRegex.disambiguation, match => `<?php ${match}; ?>`))
-      .pipe(replace(gettextRegex.noop, match => `<?php ${match}; ?>`))
-      // Rename file with .php extension
-      .pipe(
-        rename({
-          extname: ".php"
-        })
-      )
-      // Output the result to the cache folder as a .php file.
-      .pipe(gulp.dest(cacheFolder))
-  );
+const errorHandler = (error) => {
+  console.error(error);
 };
 
 /**
  * Copies some other files (e.g. used for fonts, font-awesome icons,...) into the dist directory
  */
-export const copyOtherFiles = done => {
+export const copyOtherFiles = (done) => {
   if (!config.otherFiles || config.otherFiles.length <= 0) {
     return done();
   }
@@ -131,7 +51,7 @@ export const copyOtherFiles = done => {
    * The files configuration can be passed as string or object.
    * If it's a string this string/glob will be used as src and the function will try to build a base if it has wildcards. The destination will be null (should be set by gulp.dest)
    * If it's an object the origPath and path will be used for src and dest, base is optional and will not be built.
-   * The returned array can be used to build multiple gulp streams with {@link merge-stream}. See the example gulpfile.
+   * The returned array can be used to build multiple promises with Promise.all See the example gulpfile.
    * @see examples directory for example configurations.
    *
    * @param {Object[]|string[]} files Different file configs to parse. If string can be a glob to pass to gulp.
@@ -140,12 +60,12 @@ export const copyOtherFiles = done => {
    * @param {string} files[].path The destination path to copy the file too.
    * @returns {Object[]} Array of file objects to be used in a gulp task. Each Object has a src, base and dest property.
    */
-  config.otherFiles.forEach(el => {
+  config.otherFiles.forEach((el) => {
     if (typeof el === "object") {
       parsedFiles.push({
         src: el.origPath,
         base: el.base || null,
-        dest: el.path
+        dest: el.path,
       });
     } else {
       let srcPath = el;
@@ -158,14 +78,14 @@ export const copyOtherFiles = done => {
       parsedFiles.push({
         src: el,
         base: baseDir || null,
-        dest: null
+        dest: null,
       });
     }
   });
 
   const tasks = [];
 
-  parsedFiles.forEach(fileSet => {
+  parsedFiles.forEach((fileSet) => {
     tasks.push(
       gulp
         .src(fileSet.src, { base: fileSet.base || null })
@@ -173,18 +93,18 @@ export const copyOtherFiles = done => {
     );
   });
 
-  return merge(tasks);
+  return Promise.all(tasks);
 };
 
 /**
- * Concatenate, compiles and minifies scripts and adds sourcemaps.
+ * Bundles, transpiles and minifies scripts and adds sourcemaps.
  */
 export const scripts = () => {
   let paths = Array.isArray(config.scripts.entries) // ensure src is array
     ? config.scripts.entries
     : [config.scripts.entries];
   // prefix srcDir
-  paths = paths.map(p => {
+  paths = paths.map((p) => {
     if (typeof p === "string") {
       return { path: path.join(config.scripts.srcDir, p) };
     }
@@ -193,72 +113,66 @@ export const scripts = () => {
 
     return {
       path: path.join(config.scripts.srcDir, entryPath),
-      ...entryConfig
+      ...entryConfig,
     };
   });
 
-  const tasks = paths.map(entry => {
+  const tasks = paths.map((entry) => {
     const { path: entryPath, ...entryConfig } = entry;
-    return gulp
-      .src(entryPath, { base: config.scripts.srcDir })
-      .pipe(sourcemaps.init())
-      .pipe(plumber(errorHandler))
-      .pipe(
-        rollup(
-          {
-            plugins: [
-              babel({
-                presets: config.scripts.babelPreset,
-                // exclude: ["node_modules/**"],
-                ...(entryConfig.babelConfig || {})
-              }),
-              rollupResolveNode(),
-              rollupResolveCommonjs()
-            ],
-            external: config.scripts.external,
-            ...(entryConfig.rollupConfig || {})
-          },
-          {
-            format: "iife",
-            globals: config.scripts.globals,
-            intro: config.scripts.intro || "",
-            ...(entryConfig.rollupOutputConfig || {})
-          }
-        )
-      )
-      .pipe(sourcemaps.write("./"))
-      .pipe(gulp.dest(config.scripts.dstDir))
-      .pipe(filter("**/*.js")) // remove maps from stream
-      .pipe(rename({ suffix: ".min" }))
-      .pipe(uglifyJS())
-      .pipe(gulp.dest(config.scripts.dstDir));
+
+    return rollup({
+      input: entryPath,
+      plugins: [
+        rollupResolveNode(),
+        rollupResolveCommonjs(),
+        babel({
+          presets: config.scripts.babelPreset,
+          exclude: ["node_modules/**"],
+          babelHelpers: "bundled",
+          ...(entryConfig.babelConfig || {}),
+        }),
+      ],
+      external: config.scripts.external,
+      ...(entryConfig.rollupConfig || {}),
+    })
+      .then((bundle) => {
+        return bundle.write({
+          dir: config.scripts.dstDir,
+          globals: config.scripts.globals,
+          intro: config.scripts.intro || "",
+          format: "iife",
+          sourcemap: true,
+          plugins: isProduction ? [terser()] : [],
+        });
+      })
+      .catch(errorHandler);
   });
 
-  return merge(tasks);
+  return Promise.all(tasks);
 };
 
 /**
- * Concatenate, compiles and minifies stiles and adds sourcemaps.
+ * Bundles, compiles and minifies stiles and adds sourcemaps.
  */
-export const styles = () =>{
+export const styles = () => {
   let paths = Array.isArray(config.styles.src) // ensure src is array
     ? config.styles.src
     : [config.styles.src];
-  paths = paths.map(p => path.join(config.styles.srcDir, p)); // prefix srcDir
+  paths = paths.map((p) => path.join(config.styles.srcDir, p)); // prefix srcDir
 
+  const outputStyle = isProduction ? "compressed" : "expanded";
   return gulp
     .src(paths, {
-      base: config.styles.srcDir
+      base: config.styles.srcDir,
     })
     .pipe(plumber(errorHandler))
     .pipe(sourcemaps.init())
-    .pipe(sass({ includePaths: ["node_modules"] }))
-    .pipe(autoprefixer(config.styles.prefixBrowsers))
-    .pipe(sourcemaps.write("./"))
-    .pipe(gulp.dest(config.styles.dstDir))
-    .pipe(filter("**/*.css")) // remove maps from stream
-    .pipe(rename({ suffix: ".min" }))
-    .pipe(uglifyCSS())
+    .pipe(
+      sass
+        .sync({ includePaths: ["node_modules"], outputStyle })
+        .on("error", sass.logError)
+    )
+    .pipe(autoprefixer())
     .pipe(sourcemaps.write("./"))
     .pipe(gulp.dest(config.styles.dstDir));
 };
@@ -269,17 +183,17 @@ export const styles = () =>{
 export const optimizeImages = () =>
   gulp
     .src(path.join(config.images.srcDir, "**/*"), {
-      base: config.images.srcDir
+      base: config.images.srcDir,
     })
-    .pipe(plumber({ errorHandler }))
+    .pipe(plumber(errorHandler))
     .pipe(
       imagemin([
         imagemin.gifsicle({ interlaced: true }),
-        imagemin.jpegtran({ progressive: true }),
+        imagemin.mozjpeg({ progressive: true }),
         imagemin.optipng({ optimizationLevel: 3 }),
         imagemin.svgo({
-          plugins: [{ removeViewBox: true }, { cleanupIDs: false }]
-        })
+          plugins: [{ removeViewBox: true }, { cleanupIDs: false }],
+        }),
       ])
     )
     .pipe(gulp.dest(config.images.dstDir));
@@ -287,21 +201,17 @@ export const optimizeImages = () =>
 /**
  * Translates WordPress php files to pot files.
  */
-export const translateWordPress = done => {
-  return gulp.series(compileTwigs, () => {
-    let paths = Array.isArray(config.translate.src) // ensure src is array
-      ? config.translate.src
-      : [config.translate.src];
-    if (config.translate.cacheFolder)
-      paths.push(`${config.translate.cacheFolder}/**/*.php`);
-    paths = paths.map(p => path.join(config.translate.srcDir, p)); // prefix srcDir
-    return gulp
-      .src(paths)
-      .pipe(plumber({ errorHandler }))
-      .pipe(sort())
-      .pipe(wpPot())
-      .pipe(gulp.dest(path.join(config.translate.dstDir, "translation.pot")));
-  })(done);
+export const translateWordPress = () => {
+  let paths = Array.isArray(config.translate.src) // ensure src is array
+    ? config.translate.src
+    : [config.translate.src];
+  paths = paths.map((p) => path.join(config.translate.srcDir, p)); // prefix srcDir
+  return gulp
+    .src(paths)
+    .pipe(plumber(errorHandler))
+    .pipe(sort())
+    .pipe(wpPot())
+    .pipe(gulp.dest(path.join(config.translate.dstDir, "translation.pot")));
 };
 
 /**
@@ -320,19 +230,30 @@ const watch = () => {
 };
 
 /**
- * Build Task: Clean dist directory, copy other files (before everything else if src files depend on it) and build scripts, styles, images and translations.
+ * Build Task:
+ * Sets isProduction to true to enable minify
+ * Clean dist directory, copy other files (before everything else if src files depend on it)
+ * and build scripts, styles, images and translations.
  */
-export const build = done =>
-  gulp.series(
+export const build = (done) => {
+  isProduction = true;
+  return gulp.series(
     clean,
     copyOtherFiles,
     gulp.parallel(scripts, styles, optimizeImages, translateWordPress)
   )(done);
+};
 
 /**
- * Develop Task: Call build task (see above) and watch for changes.
+ * Develop Task: Call same tasks as in build task (but with isProduction not changed from default false) and watch for changes.
  */
-export const develop = done => gulp.series(build, watch)(done);
+export const develop = (done) =>
+  gulp.series(
+    clean,
+    copyOtherFiles,
+    gulp.parallel(scripts, styles, optimizeImages, translateWordPress),
+    watch
+  )(done);
 
 /**
  * Export develop task as default.
