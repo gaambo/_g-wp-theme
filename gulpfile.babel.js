@@ -127,7 +127,8 @@ export const scripts = () => {
         rollupResolveCommonjs(),
         babel({
           presets: config.scripts.babelPreset,
-          exclude: ["node_modules/**"],
+          // exclude full node_modules -> only transpile own code; definately exclude /core-js/ to avoid circular references
+          exclude: [/node_modules/],
           babelHelpers: "bundled",
           ...(entryConfig.babelConfig || {}),
         }),
@@ -145,7 +146,9 @@ export const scripts = () => {
           plugins: isProduction ? [terser()] : [],
         });
       })
-      .catch(errorHandler);
+      .catch((err) => {
+        console.error(err.message);
+      });
   });
 
   return Promise.all(tasks);
