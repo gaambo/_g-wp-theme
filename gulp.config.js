@@ -4,7 +4,7 @@ export default {
   styles: {
     srcDir: "./src/css",
     src: ["main.scss", "editor.scss"],
-    dstDir: "./assets/css"
+    dstDir: "./assets/css",
   },
   scripts: {
     srcDir: "./src/js",
@@ -14,22 +14,22 @@ export default {
         path: "editor.js",
         babelConfig: {
           // exclude: ["node_modules/classnames/**"],
-          presets: ["@babel/preset-env", "@babel/preset-react"]
-        }
-      }
+          presets: ["@babel/preset-env", "@babel/preset-react"],
+        },
+      },
     ],
     dstDir: "./assets/js",
     babelPreset: [
       [
         "@babel/env",
         {
-          corejs: 2,
+          corejs: 3,
           useBuiltIns: "usage",
           targets: {
-            browsers: "defaults"
-          }
-        }
-      ]
+            browsers: "defaults",
+          },
+        },
+      ],
     ],
     external: [
       "jquery",
@@ -52,7 +52,7 @@ export default {
       "@wordpress/keycodes",
       "lodash",
       "react",
-      "react-dom"
+      "react-dom",
     ],
     globals: {
       jquery: "jQuery",
@@ -75,23 +75,21 @@ export default {
       "@wordpress/keycodes": "wp.keycodes",
       lodash: "lodash",
       react: "React",
-      "react-dom": "ReactDOM"
-    }
+      "react-dom": "ReactDOM",
+    },
   },
   images: {
     srcDir: "./src/images",
-    dstDir: "./assets/images"
+    dstDir: "./assets/images",
   },
   translate: {
     srcDir: "./",
     src: ["includes/**/*.php", "templates/**/*.php", "*.php", "!vendor"],
-    twigFiles: ["templates/**/*.twig"],
     dstDir: "./languages",
-    cacheFolder: ".cache"
   },
   otherFiles: [
     // examples:
-    "./src/fonts/**/*"
+    "./src/fonts/**/*",
     // {
     //   origPath: ["node_modules/optinout.js/dist/optinout.js"],
     //   path: "web/app/themes/efs/assets/libs/"
@@ -101,5 +99,5 @@ export default {
     //   base: "node_modules/optinout.js",
     //   path: "web/app/themes/efs/assets/libs/"
     // }
-  ]
+  ],
 };

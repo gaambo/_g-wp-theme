@@ -11,6 +11,7 @@
     "url": "https://github.com/gaambo/_g-wp-theme"
   },
   "dependencies": {
+    "core-js": "^3.15.2",
     "normalize.css": "^8.0.1"
   },
   "devDependencies": {
