@@ -25,9 +25,6 @@ export default {
         {
           corejs: 3,
           useBuiltIns: "usage",
-          targets: {
-            browsers: "defaults",
-          },
         },
       ],
     ],
