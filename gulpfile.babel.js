@@ -13,6 +13,9 @@ import babel from "@rollup/plugin-babel";
 import rollupResolveNode from "@rollup/plugin-node-resolve";
 import rollupResolveCommonjs from "@rollup/plugin-commonjs";
 
+// keep rollup cache in between builds
+const rollupCache = {};
+
 // CSS
 import sourcemaps from "gulp-sourcemaps"; // Maps code in a compressed file (E.g. style.css) back to it’s original position in a source file (E.g. structure.scss, which was later combined with other css files to generate style.css).
 import gulpSass from "gulp-sass"; // Gulp plugin for Sass compilation.
@@ -123,8 +126,6 @@ export const scripts = () => {
     return rollup({
       input: entryPath,
       plugins: [
-        rollupResolveNode(),
-        rollupResolveCommonjs(),
         babel({
           presets: config.scripts.babelPreset,
           // exclude full node_modules -> only transpile own code; definately exclude /core-js/ to avoid circular references
@@ -132,11 +133,15 @@ export const scripts = () => {
           babelHelpers: "bundled",
           ...(entryConfig.babelConfig || {}),
         }),
+        rollupResolveNode(),
+        rollupResolveCommonjs(),
       ],
       external: config.scripts.external,
+      cache: rollupCache[entryPath] || null, // do not set to false, otherwise its disabled entirely
       ...(entryConfig.rollupConfig || {}),
     })
       .then((bundle) => {
+        rollupCache[entryPath] = bundle.cache;
         return bundle.write({
           dir: config.scripts.dstDir,
           globals: config.scripts.globals,
